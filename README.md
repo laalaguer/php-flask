@@ -1,5 +1,5 @@
 # php-flask
- 一个模仿 Flask 的 PHP 微型框架
+ 一个模仿 Flask 的，采用PHP实现的微型框架
 
 ## 思路
 PHP 是一个多入口的大型程序，具有不太好维护的特点。而且基于`.php`文件后缀访问，容易给黑客造成上传文件形成攻击的漏洞
@@ -38,3 +38,38 @@ server {
     }
 }
 ```
+
+## 简化后的单一 PHP 实现方法 （举例 POST和 GET)
+```
+<?php
+/** 
+* DEMO 带有URL 参数匹配的处理
+ */
+require_once dirname(__FILE__).'/AppRequestHandler.class.php'; // 继承
+
+class PostInfoHandler extends AppRequestHandler{
+    function __construct($matched_regex){
+        parent::__construct($matched_regex);
+    }
+
+    // GET 方法覆盖，有匹配参数
+    public function get($matched_regex){
+        $pid = intval($matched_regex[1]);
+        return tJsonEncode(['success'=>$success, 'message'=>$message, 'code'=>200, 'data'=>$pid]);
+    }
+
+    // POST 方法覆盖
+    // 无参数
+    public function post(){
+        if(!$this->is_auth()){
+            return tJsonEncode(['success'=>false, 'message'=>'请先登录', 'code'=>500, 'data'=>null]);
+        }
+        return tJsonEncode(['success'=>$success, 'message'=>$message, 'code'=>200, 'data'=>$pid]);
+    }
+
+    // DELETE/OPTIONS/PUT 都需要覆盖对应方法来实现
+}
+```
+
+## 实用 PHP DEBUG 助手
+参见`AppUtils.php`
